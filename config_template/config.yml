@@ -1,0 +1,14 @@
+server:
+  port:
+jwt:
+  secret:
+  expiration:
+spring:
+  datasource:
+    username:
+    password:
+    driver-class-name:
+    url:
+  jpa:
+    hibernate:
+      ddl-auto:
