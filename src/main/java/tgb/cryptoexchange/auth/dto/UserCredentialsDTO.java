@@ -18,6 +18,6 @@ public class UserCredentialsDTO {
     public boolean isValidForLogin() {
         return username != null && password != null
                 && !username.isBlank() && !password.isBlank()
-                && username.length() >= 3;  // Пароль может быть любым
+                && username.length() >= 3;
     }
 }
