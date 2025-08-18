@@ -38,3 +38,7 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+tasks.jar {
+    archiveFileName = "auth.jar"
+}
