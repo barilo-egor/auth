@@ -34,12 +34,12 @@ class AuthControllerTest {
 
     @ParameterizedTest
     @CsvSource({
-            "username1", ""
+            "username1,Qwe123!@$",
+            "user,123qweQWE!@#",
+            "admin,qQ12345&"
     })
-    @DisplayName("Должен вернуть токен.")
-    void registerShouldReturnToken() throws Exception {
-        String username = "username";
-        String password = "password123!%";
+    @DisplayName("/auth/register - валидные значения - возвращает токен")
+    void registerShouldReturnToken(String username, String password) throws Exception {
         String token = "token";
         when(authService.register(username, password)).thenReturn(token);
         mockMvc.perform(post("/auth/register")
@@ -52,7 +52,7 @@ class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("Должен вернуть статус 400 при невалидных данных для регистрации.")
+    @DisplayName("/auth/register - невалидное значение - возвращает 400")
     void shouldReturn400IfCredentialIsInvalid() throws Exception {
         mockMvc.perform(post("/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
