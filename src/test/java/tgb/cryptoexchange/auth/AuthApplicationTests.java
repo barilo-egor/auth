@@ -8,6 +8,7 @@ class AuthApplicationTests {
 
     @Test
     void contextLoads() {
+        // Пустой тест для проверки контекста
     }
 
 }

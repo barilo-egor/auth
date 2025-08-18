@@ -1,10 +1,8 @@
 package tgb.cryptoexchange.auth.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import tgb.cryptoexchange.auth.entity.User;
-import tgb.cryptoexchange.auth.exception.AuthException;
 import tgb.cryptoexchange.auth.exception.LoginException;
 import tgb.cryptoexchange.auth.exception.UsernameAlreadyTakenException;
 import tgb.cryptoexchange.auth.repository.UserRepository;

@@ -1,6 +1,5 @@
 package tgb.cryptoexchange.auth.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,7 +11,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import tgb.cryptoexchange.auth.entity.User;
 import tgb.cryptoexchange.auth.exception.AuthException;
 import tgb.cryptoexchange.auth.exception.LoginException;
-import tgb.cryptoexchange.auth.exception.UsernameAlreadyTakenException;
 import tgb.cryptoexchange.auth.repository.UserRepository;
 
 import java.util.Optional;
