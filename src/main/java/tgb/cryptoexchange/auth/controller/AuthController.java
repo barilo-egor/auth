@@ -28,21 +28,41 @@ public class AuthController extends ApiController {
                     HttpStatus.BAD_REQUEST
             );
         }
-        String token = authService.register(credentials.getUsername(), credentials.getPassword());
-        return new ResponseEntity<>(
-                ApiResponse.success(token),
-                HttpStatus.CREATED
-        );
+        try {
+            String token = authService.register(credentials.getUsername(), credentials.getPassword());
+            return new ResponseEntity<>(
+                    ApiResponse.success(token),
+                    HttpStatus.CREATED
+            );
+        } catch (AuthException e) {
+            return new ResponseEntity<>(
+                    ApiResponse.error(ApiResponse.Error.builder().message(e.getMessage()).build()),
+                    HttpStatus.CONFLICT
+            );
+        }
     }
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<String>> login(@RequestBody UserCredentialsDTO credentials) {
-        return new ResponseEntity<>(
-                ApiResponse.success(
-                        authService.login(credentials.getUsername(), credentials.getPassword())
-                ),
-                HttpStatus.CREATED
-        );
+        if (!credentials.isValidForLogin()) {
+            return new ResponseEntity<>(
+                    ApiResponse.error(ApiResponse.Error.builder().message("Invalid data").build()),
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+        try {
+            return new ResponseEntity<>(
+                    ApiResponse.success(
+                            authService.login(credentials.getUsername(), credentials.getPassword())
+                    ),
+                    HttpStatus.CREATED
+            );
+        } catch (AuthException e) {
+            return new ResponseEntity<>(
+                    ApiResponse.error(ApiResponse.Error.builder().message(e.getMessage()).build()),
+                    HttpStatus.FORBIDDEN
+            );
+        }
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
@@ -55,18 +75,6 @@ public class AuthController extends ApiController {
                                 .build()
                 ),
                 HttpStatus.NOT_FOUND
-        );
-    }
-
-    @ExceptionHandler(AuthException.class)
-    public ResponseEntity<ApiResponse<Void>> handleAuthException(AuthException e) {
-        return new ResponseEntity<>(
-                ApiResponse.error(
-                        ApiResponse.Error.builder()
-                                .message(e.getMessage())
-                                .build()
-                ),
-                HttpStatus.FORBIDDEN
         );
     }
 }
