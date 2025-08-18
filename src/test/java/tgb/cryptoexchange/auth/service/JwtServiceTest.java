@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
@@ -31,6 +32,7 @@ class JwtServiceTest {
     }
 
     @Test
+    @DisplayName("generateToken(String username) - валидный юзернейм - токен должен содержать юзернейм и валидное время жизни")
     void generateToken_ShouldContainCorrectUsernameAndExpiration() {
         String username = "testuser";
         String token = jwtService.generateToken(username);
@@ -48,6 +50,7 @@ class JwtServiceTest {
     }
 
     @Test
+    @DisplayName("generateToken(String username) - неверный ключ - проброс SecurityException")
     void generateToken_WithWrongKey_ShouldFailParsing() {
         String token = jwtService.generateToken("user");
 
