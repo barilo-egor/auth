@@ -11,6 +11,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import tgb.cryptoexchange.auth.entity.User;
 import tgb.cryptoexchange.auth.exception.AuthException;
+import tgb.cryptoexchange.auth.exception.LoginException;
+import tgb.cryptoexchange.auth.exception.UsernameAlreadyTakenException;
 import tgb.cryptoexchange.auth.repository.UserRepository;
 
 import java.util.Optional;
@@ -80,7 +82,7 @@ class AuthServiceTest {
 
         when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
         assertThrows(
-                EntityNotFoundException.class,
+                LoginException.class,
                 () -> authService.login(username, password),
                 "User not found"
         );

@@ -5,6 +5,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import tgb.cryptoexchange.auth.entity.User;
 import tgb.cryptoexchange.auth.exception.AuthException;
+import tgb.cryptoexchange.auth.exception.LoginException;
+import tgb.cryptoexchange.auth.exception.UsernameAlreadyTakenException;
 import tgb.cryptoexchange.auth.repository.UserRepository;
 
 @Service
@@ -22,7 +24,7 @@ public class AuthService {
 
     public String register(String username, String rawPassword) {
         if (userRepository.findByUsername(username).isPresent()) {
-            throw new AuthException("Username is taken by another user");
+            throw new UsernameAlreadyTakenException("Username is taken by another user");
         }
         User user = new User();
         user.setUsername(username);
@@ -33,9 +35,9 @@ public class AuthService {
 
     public String login(String username, String rawPassword) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+                .orElseThrow(() -> new LoginException("Invalid credentials"));
         if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
-            throw new AuthException("Invalid password");
+            throw new LoginException("Invalid credentials");
         }
         return jwtService.generateToken(username);
     }

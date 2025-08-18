@@ -1,5 +1,6 @@
 package tgb.cryptoexchange.auth.controller;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -11,6 +12,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import tgb.cryptoexchange.auth.config.SecurityConfig;
+import tgb.cryptoexchange.auth.controller.advice.GlobalExceptionHandler;
+import tgb.cryptoexchange.auth.exception.AuthException;
+import tgb.cryptoexchange.auth.exception.LoginException;
+import tgb.cryptoexchange.auth.exception.UsernameAlreadyTakenException;
 import tgb.cryptoexchange.auth.service.AuthService;
 import tgb.cryptoexchange.auth.service.UserService;
 
@@ -20,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = AuthController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, GlobalExceptionHandler.class})
 class AuthControllerTest {
 
     @Autowired
@@ -44,7 +49,7 @@ class AuthControllerTest {
         when(authService.register(username, password)).thenReturn(token);
         mockMvc.perform(post("/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"username\":\"" + username + "\", \"password\":\"" + password + "\"}")
+                        .content("{\"username\":\"" + username + "\", \"password\":\"" + password + "\"}")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.success").value(true))
@@ -58,6 +63,49 @@ class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"username\":\"username\", \"password\":\"qwerty\"}")
                         .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("/auth/login - проброшено LoginException - возвращает 403")
+    void loginShouldReturn403IfLoginExceptionThrown() throws Exception {
+        String username = "username";
+        String password = "Qwe123#$%";
+        String exceptionMessage = "message";
+        when(authService.login(username, password)).thenThrow(new LoginException(exceptionMessage));
+        mockMvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"" + username + "\", \"password\":\"" + password + "\"}"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.error.message").value(exceptionMessage));
+    }
+
+    @Test
+    @DisplayName("/auth/login - проброшено UsernameAlreadyTakenException - возвращает 403")
+    void loginShouldReturn403IfUsernameAlreadyTakenExceptionThrown() throws Exception {
+        String username = "username";
+        String password = "Qwe123#$%";
+        String exceptionMessage = "message";
+        when(authService.register(username, password)).thenThrow(new UsernameAlreadyTakenException(exceptionMessage));
+        mockMvc.perform(post("/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"" + username + "\", \"password\":\"" + password + "\"}"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.error.message").value(exceptionMessage));
+    }
+
+    @Test
+    @DisplayName("/auth/login - невалидные данные для логина - возвращает 400")
+    void shouldReturn400IfNotValidUsername() throws Exception {
+        String username = "us";
+        mockMvc.perform(post("/auth/login")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"username\":\"" + username + "\", \"password\":\"qwerty\"}"))
                 .andExpect(status().isBadRequest());
     }
 }
