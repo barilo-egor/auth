@@ -26,7 +26,7 @@ class UserServiceTest {
     private UserService userService;
 
     @Test
-    @DisplayName("Должен пробросить исключение, если пользователь не найден.")
+    @DisplayName("loadUserByUsername(username) - пользователя нет в БД - проброс UsernameNotFoundException")
     void shouldThrowExceptionWhenUsernameNotFound() {
         String username = "test";
         when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
@@ -34,7 +34,7 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("Должен вернуть пользователя.")
+    @DisplayName("loadUserByUsername(username) - пользователь есть в БД - возвращение пользователя с данным юзернеймом")
     void shouldReturnUser() {
         String username = "test";
         String password = "password";
