@@ -1,6 +1,5 @@
 package tgb.cryptoexchange.auth.controller;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -13,7 +12,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import tgb.cryptoexchange.auth.config.SecurityConfig;
 import tgb.cryptoexchange.auth.controller.advice.GlobalExceptionHandler;
-import tgb.cryptoexchange.auth.exception.AuthException;
 import tgb.cryptoexchange.auth.exception.LoginException;
 import tgb.cryptoexchange.auth.exception.UsernameAlreadyTakenException;
 import tgb.cryptoexchange.auth.service.AuthService;
@@ -99,14 +97,14 @@ class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("/auth/login - невалидные данные для логина - возвращает 400")
+    @DisplayName("/auth/login - невалидные данные для логина - возвращает 403")
     void shouldReturn400IfNotValidUsername() throws Exception {
         String username = "us";
         mockMvc.perform(post("/auth/login")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"username\":\"" + username + "\", \"password\":\"qwerty\"}"))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test
