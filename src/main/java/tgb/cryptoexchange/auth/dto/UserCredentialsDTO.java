@@ -11,7 +11,7 @@ public class UserCredentialsDTO {
 
     public boolean isValidForRegistration() {
         return username != null && password != null && !username.isBlank() && !password.isBlank()
-                && password.length() > 8 && username.length() >= 3
+                && password.length() >= 8 && username.length() >= 3
                 && password.matches("^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).+$");
     }
 
