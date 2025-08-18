@@ -1,0 +1,20 @@
+server:
+  port:
+jwt:
+  secret:
+  expiration:
+spring:
+  datasource:
+    username:
+    password:
+    driver-class-name:
+    url:
+  jpa:
+    hibernate:
+      ddl-auto:
+springdoc:
+  swagger-ui:
+    enabled:
+    path:
+  api-docs:
+    path:
