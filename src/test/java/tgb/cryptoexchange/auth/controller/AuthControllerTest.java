@@ -108,4 +108,20 @@ class AuthControllerTest {
                 .content("{\"username\":\"" + username + "\", \"password\":\"qwerty\"}"))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    @DisplayName("/auth/login - валидные значения - возвращает токен")
+    void shouldReturnToken() throws Exception {
+        String username = "username";
+        String password = "Qwe123#$%";
+        String token = "token";
+        when(authService.login(username, password)).thenReturn(token);
+        mockMvc.perform(post("/auth/login")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"" + username + "\", \"password\":\"" + password + "\"}"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data").value(token));
+    }
 }
