@@ -12,3 +12,9 @@ spring:
   jpa:
     hibernate:
       ddl-auto:
+springdoc:
+  swagger-ui:
+    enabled:
+    path:
+  api-docs:
+    path:
