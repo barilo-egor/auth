@@ -34,7 +34,7 @@ class AuthServiceTest {
     private AuthService authService;
 
     @Test
-    @DisplayName("Должен пробросить исключение, если юзернейм уже занят.")
+    @DisplayName("register(String username, String rawPassword) - уже существующий юзернейм - проброс AuthException")
     void registerShouldThrowExceptionWhenUserExists() {
         String username = "test";
         User user = new User();
@@ -50,7 +50,7 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("Должен зарегистрировать пользователя и вернуть токен.")
+    @DisplayName("register(String username, String rawPassword) - пользователя не существует - возвращение сгенерированного токена")
     void registerShouldSaveUserAndReturnToken() {
         String username = "test";
         String password = "password";
@@ -88,7 +88,7 @@ class AuthServiceTest {
 
 
     @Test
-    @DisplayName("Должен пробросить исключение, если пароль неверен.")
+    @DisplayName("login(String username, String rawPassword) - неверный пароль - проброс AuthException")
     void shouldThrowExceptionWhenPasswordIsIncorrect() {
         String username = "test";
         String password = "password";
@@ -103,7 +103,7 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("Должен сгенерировать токен.")
+    @DisplayName("login(String username, String rawPassword) - верный пароль - возвращение сгенерированного токена")
     void shouldGenerateTokenWhenUserExists() {
         String username = "test";
         String password = "password";
