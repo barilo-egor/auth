@@ -41,7 +41,7 @@ class AuthControllerTest {
             "user,123qweQWE!@#",
             "admin,qQ12345&"
     })
-    @DisplayName("/auth/register - валидные значения - возвращает токен")
+    @DisplayName("POST /auth/register - валидные значения - возвращает токен")
     void registerShouldReturnToken(String username, String password) throws Exception {
         String token = "token";
         when(authService.register(username, password)).thenReturn(token);
@@ -55,7 +55,7 @@ class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("/auth/register - невалидное значение - возвращает 400")
+    @DisplayName("POST /auth/register - невалидное значение - возвращает 400")
     void shouldReturn400IfCredentialIsInvalid() throws Exception {
         mockMvc.perform(post("/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -65,7 +65,7 @@ class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("/auth/login - проброшено LoginException - возвращает 403")
+    @DisplayName("POST /auth/login - проброшено LoginException - возвращает 403")
     void loginShouldReturn403IfLoginExceptionThrown() throws Exception {
         String username = "username";
         String password = "Qwe123#$%";
@@ -81,7 +81,7 @@ class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("/auth/login - проброшено UsernameAlreadyTakenException - возвращает 403")
+    @DisplayName("POST /auth/login - проброшено UsernameAlreadyTakenException - возвращает 403")
     void loginShouldReturn403IfUsernameAlreadyTakenExceptionThrown() throws Exception {
         String username = "username";
         String password = "Qwe123#$%";
@@ -97,7 +97,7 @@ class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("/auth/login - невалидные данные для логина - возвращает 403")
+    @DisplayName("POST /auth/login - невалидные данные для логина - возвращает 403")
     void shouldReturn400IfNotValidUsername() throws Exception {
         String username = "us";
         mockMvc.perform(post("/auth/login")
@@ -108,7 +108,7 @@ class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("/auth/login - валидные значения - возвращает токен")
+    @DisplayName("POST /auth/login - валидные значения - возвращает токен")
     void shouldReturnToken() throws Exception {
         String username = "username";
         String password = "Qwe123#$%";
