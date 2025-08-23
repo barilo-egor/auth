@@ -7,14 +7,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import tgb.cryptoexchange.auth.dto.UserCredentialsDTO;
 import tgb.cryptoexchange.auth.service.AuthService;
+import tgb.cryptoexchange.auth.service.UserService;
 import tgb.cryptoexchange.web.ApiResponse;
 import tgb.cryptoexchange.web.LogResponseBody;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/auth")
@@ -24,8 +24,11 @@ public class AuthController {
 
     private final AuthService authService;
 
-    public AuthController(AuthService authService) {
+    private final UserService userService;
+
+    public AuthController(AuthService authService, UserService userService) {
         this.authService = authService;
+        this.userService = userService;
     }
 
     @Operation(summary = "Регистрация нового пользователя.", description = "Возвращает JWT в случае успешной регистрации.")
@@ -86,5 +89,32 @@ public class AuthController {
                 ),
                 HttpStatus.CREATED
         );
+    }
+
+    @Operation(summary = "Получение всех юзернеймов.",
+            description = "Возвращает список всех юзернеймов зарегистрированных пользователей.")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200", description = "Список юзернеймов сформирован."
+            )
+    })
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<String>>> getUsers() {
+         return new ResponseEntity<>(ApiResponse.success(userService.getUsernames()), HttpStatus.OK);
+    }
+
+    @Operation(summary = "Удаление пользователя по username.")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "204", description = "Пользователь успешно удален."
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400", description = "Пользователь по данному юзернейму не найден."
+            )
+    })
+    @DeleteMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@RequestParam(required = false) String username) {
+        userService.delete(username);
     }
 }

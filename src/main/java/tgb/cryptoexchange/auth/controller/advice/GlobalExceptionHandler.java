@@ -2,6 +2,7 @@ package tgb.cryptoexchange.auth.controller.advice;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import tgb.cryptoexchange.auth.exception.LoginException;
@@ -24,6 +25,14 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(
                 ApiResponse.error(ApiResponse.Error.builder().message(e.getMessage()).build()),
                 HttpStatus.CONFLICT
+        );
+    }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handlerUsernameNotFoundException(UsernameNotFoundException e) {
+        return new ResponseEntity<>(
+                ApiResponse.error(ApiResponse.Error.builder().message(e.getMessage()).build()),
+                HttpStatus.BAD_REQUEST
         );
     }
 }
