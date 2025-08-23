@@ -1,5 +1,6 @@
 package tgb.cryptoexchange.auth.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import tgb.cryptoexchange.auth.entity.User;
@@ -7,6 +8,7 @@ import tgb.cryptoexchange.auth.exception.LoginException;
 import tgb.cryptoexchange.auth.exception.UsernameAlreadyTakenException;
 import tgb.cryptoexchange.auth.repository.UserRepository;
 
+@Slf4j
 @Service
 public class AuthService {
 
@@ -28,6 +30,7 @@ public class AuthService {
         user.setUsername(username);
         user.setPassword(passwordEncoder.encode(rawPassword));
         userRepository.save(user);
+        log.info("Зарегистрирован новый пользователь {} под идентификатором {}", username, user.getId());
         return jwtService.generateToken(username);
     }
 
@@ -37,6 +40,7 @@ public class AuthService {
         if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
             throw new LoginException("Invalid credentials");
         }
+        log.debug("Была осуществлена аутентификация пользователя {} с идентификатором {}", username, user.getId());
         return jwtService.generateToken(username);
     }
 }

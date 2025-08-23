@@ -18,3 +18,9 @@ springdoc:
     path:
   api-docs:
     path:
+logging:
+  level:
+    root: INFO
+    org.springframework: INFO
+    org.hibernate: INFO
+    tgb.cryptoexchange: DEBUG
