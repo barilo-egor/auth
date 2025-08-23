@@ -3,6 +3,9 @@ package tgb.cryptoexchange.auth.service;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -16,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -78,6 +82,25 @@ class UserServiceTest {
                 () -> assertTrue(actual.contains("test2")),
                 () -> assertTrue(actual.contains("test3"))
         );
+    }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"", "   "})
+    @NullSource
+    @DisplayName("delete(username) - пользователь не найден - проброс UsernameNotFoundException")
+    void shouldThrowExceptionWhenUserNotFound(String username) {
+        when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
+        assertThrows(UsernameNotFoundException.class, () -> userService.delete(username), "User not found");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"qwe", "username"})
+    @DisplayName("delete(username) - пользователь найден - пользователь удален")
+    void shouldDeleteUser(String username) {
+        User user = new User();
+        user.setUsername(username);
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+        userService.delete(username);
+        verify(userRepository).delete(user);
     }
 }

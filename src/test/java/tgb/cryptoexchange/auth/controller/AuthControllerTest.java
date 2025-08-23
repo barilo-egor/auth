@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import tgb.cryptoexchange.auth.config.SecurityConfig;
@@ -20,9 +21,10 @@ import tgb.cryptoexchange.auth.service.UserService;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -158,5 +160,27 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.data[1]").value("username2"))
                 .andExpect(jsonPath("$.data[2]").value("username3"))
                 .andExpect(jsonPath("$.data[3]").doesNotExist());
+    }
+
+    @Test
+    @DisplayName("DELETE /auth/ - пользователи отсутствуют - возвращается ответ с пустым data")
+    void deleteShouldReturn400() throws Exception {
+        doThrow(new UsernameNotFoundException("User not found")).when(userService).delete(anyString());
+        mockMvc.perform(delete("/auth")
+                        .param("username", "someUsername")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.error").exists())
+                .andExpect(jsonPath("$.error.message").value("User not found"));
+    }
+
+    @Test
+    @DisplayName("DELETE /auth/ - пользователь существует - возвращается 204")
+    void deleteShouldReturn204() throws Exception {
+        mockMvc.perform(delete("/auth")
+                        .param("username", "someUsername")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
     }
 }

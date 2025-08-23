@@ -102,4 +102,19 @@ public class AuthController {
     public ResponseEntity<ApiResponse<List<String>>> getUsers() {
          return new ResponseEntity<>(ApiResponse.success(userService.getUsernames()), HttpStatus.OK);
     }
+
+    @Operation(summary = "Удаление пользователя по username.")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "204", description = "Пользователь успешно удален."
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400", description = "Пользователь по данному юзернейму не найден."
+            )
+    })
+    @DeleteMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@RequestParam(required = false) String username) {
+        userService.delete(username);
+    }
 }

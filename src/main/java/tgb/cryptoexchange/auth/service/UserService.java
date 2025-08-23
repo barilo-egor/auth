@@ -33,4 +33,10 @@ public class UserService implements UserDetailsService {
     public List<String> getUsernames() {
         return userRepository.findAll().stream().map(User::getUsername).toList();
     }
+
+    public void delete(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        userRepository.delete(user);
+    }
 }
