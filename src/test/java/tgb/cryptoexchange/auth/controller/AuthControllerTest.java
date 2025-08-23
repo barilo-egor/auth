@@ -17,7 +17,11 @@ import tgb.cryptoexchange.auth.exception.UsernameAlreadyTakenException;
 import tgb.cryptoexchange.auth.service.AuthService;
 import tgb.cryptoexchange.auth.service.UserService;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -121,5 +125,38 @@ class AuthControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data").value(token));
+    }
+
+    @Test
+    @DisplayName("GET /auth/ - пользователи отсутствуют - возвращается ответ с пустым data")
+    void shouldReturnEmptyList() throws Exception {
+        when(userService.getUsernames()).thenReturn(new ArrayList<>());
+        mockMvc.perform(get("/auth")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data").isArray())
+                .andExpect(jsonPath("$.data").isEmpty());
+    }
+
+    @Test
+    @DisplayName("GET /auth/ - пользователи отсутствуют - возвращается ответ с пустым data")
+    void shouldReturnUsernamesList() throws Exception {
+        List<String> usernames = new ArrayList<>();
+        usernames.add("username1");
+        usernames.add("username2");
+        usernames.add("username3");
+        when(userService.getUsernames()).thenReturn(usernames);
+        mockMvc.perform(get("/auth")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data").isArray())
+                .andExpect(jsonPath("$.data[0]").value("username1"))
+                .andExpect(jsonPath("$.data[1]").value("username2"))
+                .andExpect(jsonPath("$.data[2]").value("username3"))
+                .andExpect(jsonPath("$.data[3]").doesNotExist());
     }
 }

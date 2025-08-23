@@ -11,6 +11,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import tgb.cryptoexchange.auth.entity.User;
 import tgb.cryptoexchange.auth.repository.UserRepository;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -49,5 +51,33 @@ class UserServiceTest {
                 () -> assertEquals(user.getPassword(), actual.getPassword()),
                 () -> assertEquals(0, actual.getAuthorities().size())
         );
+    }
+
+    @Test
+    @DisplayName("getUsernames() - в БД нет пользователей - возвращает пустой список")
+    void shouldReturnEmptyListWhenNoUsers() {
+        when(userRepository.findAll()).thenReturn(new ArrayList<>());
+        List<String> actual = userService.getUsernames();
+        assertNotNull(actual);
+        assertTrue(actual.isEmpty());
+    }
+
+    @Test
+    @DisplayName("getUsernames() - в БД есть пользователи - возвращает список юзернеймов")
+    void shouldReturnUsernames() {
+        List<User> users = new ArrayList<>();
+        users.add(new User(1L, "test1", "password1"));
+        users.add(new User(2L, "test2", "password2"));
+        users.add(new User(3L, "test3", "password3"));
+        when(userRepository.findAll()).thenReturn(users);
+        List<String> actual = userService.getUsernames();
+        assertAll(
+                () -> assertNotNull(actual),
+                () -> assertEquals(3, actual.size()),
+                () -> assertTrue(actual.contains("test1")),
+                () -> assertTrue(actual.contains("test2")),
+                () -> assertTrue(actual.contains("test3"))
+        );
+
     }
 }

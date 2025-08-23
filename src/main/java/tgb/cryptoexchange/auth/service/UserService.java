@@ -8,6 +8,7 @@ import tgb.cryptoexchange.auth.entity.User;
 import tgb.cryptoexchange.auth.repository.UserRepository;
 
 import java.util.Collections;
+import java.util.List;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -27,5 +28,9 @@ public class UserService implements UserDetailsService {
                 user.getPassword(),
                 Collections.emptyList()
         );
+    }
+
+    public List<String> getUsernames() {
+        return userRepository.findAll().stream().map(User::getUsername).toList();
     }
 }
