@@ -1,10 +1,14 @@
 package tgb.cryptoexchange.auth.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Schema(description = "Модель данных создаваемого/существующего пользователя")
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserCredentialsDTO {
 
     @Schema(description = "Юзернейм пользователя.", requiredMode = Schema.RequiredMode.REQUIRED)
