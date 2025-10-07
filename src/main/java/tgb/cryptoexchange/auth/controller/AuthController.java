@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import tgb.cryptoexchange.auth.dto.UserCredentialsDTO;
 import tgb.cryptoexchange.auth.service.AuthService;
@@ -26,9 +27,12 @@ public class AuthController {
 
     private final UserService userService;
 
-    public AuthController(AuthService authService, UserService userService) {
+    private final BCryptPasswordEncoder passwordEncoder;
+
+    public AuthController(AuthService authService, UserService userService, BCryptPasswordEncoder passwordEncoder) {
         this.authService = authService;
         this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Operation(summary = "Регистрация нового пользователя.", description = "Возвращает JWT в случае успешной регистрации.")
@@ -121,6 +125,6 @@ public class AuthController {
     @PatchMapping("/{username}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void patch(@PathVariable String username, @RequestParam String password) {
-        userService.updatePassword(username, password);
+        userService.updatePassword(username, passwordEncoder.encode(password));
     }
 }
