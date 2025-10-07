@@ -121,7 +121,6 @@ class UserServiceTest {
         User user = new User();
         user.setPassword("qwerty123!@#");
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
-        when(bCryptPasswordEncoder.encode(password)).thenReturn(password);
         userService.updatePassword("username", password);
         ArgumentCaptor<User> userArgumentCaptor = ArgumentCaptor.forClass(User.class);
         verify(userRepository).save(userArgumentCaptor.capture());
