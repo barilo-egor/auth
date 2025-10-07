@@ -112,9 +112,15 @@ public class AuthController {
                     responseCode = "400", description = "Пользователь по данному юзернейму не найден."
             )
     })
-    @DeleteMapping
+    @DeleteMapping("/{username}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@RequestParam(required = false) String username) {
+    public void delete(@PathVariable String username) {
         userService.delete(username);
+    }
+
+    @PatchMapping("/{username}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void patch(@PathVariable String username, @RequestParam String password) {
+        userService.updatePassword(username, password);
     }
 }
