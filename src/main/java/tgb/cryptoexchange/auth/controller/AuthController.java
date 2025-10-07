@@ -122,9 +122,26 @@ public class AuthController {
         userService.delete(username);
     }
 
+    @Operation(summary = "Обновление пользователя по username.")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "204", description = "Пользователь успешно обновлен."
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400", description = "Пользователь по данному юзернейму не найден, либо пароль невалиден."
+            )
+    })
     @PatchMapping("/{username}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void patch(@PathVariable String username, @RequestParam String password) {
+    public ResponseEntity<ApiResponse<Object>> patch(@PathVariable String username, @RequestParam String password) {
+        UserCredentialsDTO userCredentialsDTO = new UserCredentialsDTO(username, password);
+        if (!userCredentialsDTO.isValidForRegistration()) {
+            return new ResponseEntity<>(
+                    ApiResponse.error(ApiResponse.Error.builder().message("Invalid password").build()),
+                    HttpStatus.BAD_REQUEST
+            );
+        }
         userService.updatePassword(username, passwordEncoder.encode(password));
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

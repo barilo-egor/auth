@@ -184,10 +184,10 @@ class AuthControllerTest {
 
     @Test
     @DisplayName("PATCH /auth/ - пользователи отсутствуют - возвращается ответ с пустым data")
-    void patchShouldReturn400() throws Exception {
+    void patchShouldReturn400IfUserNotFound() throws Exception {
         doThrow(new UsernameNotFoundException("User not found")).when(userService).updatePassword(anyString(), anyString());
         mockMvc.perform(patch("/auth/someUsername")
-                        .param("password", "newPassword")
+                        .param("password", "qweSQsd12312!@#")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.success").value(false))
@@ -196,10 +196,23 @@ class AuthControllerTest {
     }
 
     @Test
+    @DisplayName("PATCH /auth/ - пользователи отсутствуют - возвращается ответ с пустым data")
+    void patchShouldReturn400IfPasswordInvalid() throws Exception {
+        doThrow(new UsernameNotFoundException("User not found")).when(userService).updatePassword(anyString(), anyString());
+        mockMvc.perform(patch("/auth/someUsername")
+                        .param("password", "newPassword")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.error").exists())
+                .andExpect(jsonPath("$.error.message").value("Invalid password"));
+    }
+
+    @Test
     @DisplayName("PATCH /auth - пользователь существует - возвращается 204, пароль обновлен")
     void patchShouldReturn204() throws Exception {
         mockMvc.perform(patch("/auth/someUsername")
-                        .param("password", "newPassword"))
+                        .param("password", "qqweADSDS!@#352"))
                 .andExpect(status().isNoContent());
     }
 
