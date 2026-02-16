@@ -11,7 +11,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import tgb.cryptoexchange.auth.config.AppSecurityProperties;
 import tgb.cryptoexchange.auth.config.SecurityConfig;
 import tgb.cryptoexchange.auth.controller.advice.GlobalExceptionHandler;
 import tgb.cryptoexchange.auth.exception.LoginException;
@@ -32,9 +31,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = AuthController.class)
 @Import({SecurityConfig.class, GlobalExceptionHandler.class})
 class AuthControllerTest {
-
-    @MockitoBean
-    private AppSecurityProperties appSecurityProperties;
 
     @Autowired
     private MockMvc mockMvc;

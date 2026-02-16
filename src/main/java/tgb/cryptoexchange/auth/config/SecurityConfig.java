@@ -16,11 +16,8 @@ public class SecurityConfig {
 
     private final UserService userDetailsService;
 
-    private final AppSecurityProperties appSecurityProperties;
-
-    public SecurityConfig(UserService userDetailsService, AppSecurityProperties appSecurityProperties) {
+    public SecurityConfig(UserService userDetailsService) {
         this.userDetailsService = userDetailsService;
-        this.appSecurityProperties = appSecurityProperties;
     }
 
     @Bean
@@ -46,8 +43,10 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/swagger/**", "/swagger/api-docs/**", "/swagger-ui/**").permitAll()
-                        .requestMatchers(appSecurityProperties.getIgnoreUrls().toArray(String[]::new)).permitAll()
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/swagger/**").permitAll()
+                        .requestMatchers("/swagger/api-docs/**").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
                         .anyRequest().authenticated()
                 );
         return http.build();
