@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @NoArgsConstructor
@@ -15,5 +16,5 @@ import java.util.List;
 @ConfigurationProperties(prefix = "app.security")
 public class AppSecurityProperties {
 
-    private List<String> ignoreUrls;
+    private List<String> ignoreUrls = new ArrayList<>();
 }
