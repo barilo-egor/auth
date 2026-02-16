@@ -6,11 +6,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import tgb.cryptoexchange.auth.entity.User;
 import tgb.cryptoexchange.auth.repository.UserRepository;
 
@@ -19,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -30,6 +33,9 @@ class UserServiceTest {
 
     @InjectMocks
     private UserService userService;
+
+    @Mock
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Test
     @DisplayName("loadUserByUsername(username) - пользователя нет в БД - проброс UsernameNotFoundException")
@@ -102,5 +108,29 @@ class UserServiceTest {
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
         userService.delete(username);
         verify(userRepository).delete(user);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "Qwerty1234567!@#",
+            "Jofng@#$123qwe",
+            "as!doF9%H8FO@N8F!ej76#4f%n"
+    })
+    @DisplayName("updatePassword(username, password) - пользователь существует - пароль пользователя обновлен")
+    void updatePasswordShouldUpdateUserPassword(String password) {
+        User user = new User();
+        user.setPassword("qwerty123!@#");
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
+        userService.updatePassword("username", password);
+        ArgumentCaptor<User> userArgumentCaptor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).save(userArgumentCaptor.capture());
+        assertEquals(password, userArgumentCaptor.getValue().getPassword());
+    }
+
+    @Test
+    @DisplayName("updatePassword(username, password) - пользователя нет в БД - проброшен UsernameNotFoundException")
+    void updatePasswordShouldThrowUsernameNotFoundException() {
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
+        assertThrows(UsernameNotFoundException.class, () -> userService.updatePassword("username", "password"));
     }
 }

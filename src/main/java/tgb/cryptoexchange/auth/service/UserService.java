@@ -39,4 +39,11 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         userRepository.delete(user);
     }
+
+    public void updatePassword(String username, String newPassword) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Invalid credentials"));
+        user.setPassword(newPassword);
+        userRepository.save(user);
+    }
 }

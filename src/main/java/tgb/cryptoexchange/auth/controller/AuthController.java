@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import tgb.cryptoexchange.auth.dto.UserCredentialsDTO;
 import tgb.cryptoexchange.auth.service.AuthService;
@@ -26,9 +27,12 @@ public class AuthController {
 
     private final UserService userService;
 
-    public AuthController(AuthService authService, UserService userService) {
+    private final BCryptPasswordEncoder passwordEncoder;
+
+    public AuthController(AuthService authService, UserService userService, BCryptPasswordEncoder passwordEncoder) {
         this.authService = authService;
         this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Operation(summary = "Регистрация нового пользователя.", description = "Возвращает JWT в случае успешной регистрации.")
@@ -112,9 +116,32 @@ public class AuthController {
                     responseCode = "400", description = "Пользователь по данному юзернейму не найден."
             )
     })
-    @DeleteMapping
+    @DeleteMapping("/{username}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@RequestParam(required = false) String username) {
+    public void delete(@PathVariable String username) {
         userService.delete(username);
+    }
+
+    @Operation(summary = "Обновление пользователя по username.")
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "204", description = "Пользователь успешно обновлен."
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400", description = "Пользователь по данному юзернейму не найден, либо пароль невалиден."
+            )
+    })
+    @PatchMapping("/{username}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public ResponseEntity<ApiResponse<Object>> patch(@PathVariable String username, @RequestParam String password) {
+        UserCredentialsDTO userCredentialsDTO = new UserCredentialsDTO(username, password);
+        if (!userCredentialsDTO.isValidForRegistration()) {
+            return new ResponseEntity<>(
+                    ApiResponse.error(ApiResponse.Error.builder().message("Invalid password").build()),
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+        userService.updatePassword(username, passwordEncoder.encode(password));
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
