@@ -1,5 +1,6 @@
 package tgb.cryptoexchange.auth.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,11 +17,11 @@ public class SecurityConfig {
 
     private final UserService userDetailsService;
 
-    private final AppSecurityProperties appSecurityProperties;
+    @Value("${app.security.ignore-urls:}")
+    private String[] ignoreUrls;
 
-    public SecurityConfig(UserService userDetailsService, AppSecurityProperties appSecurityProperties) {
+    public SecurityConfig(UserService userDetailsService) {
         this.userDetailsService = userDetailsService;
-        this.appSecurityProperties = appSecurityProperties;
     }
 
     @Bean
@@ -47,7 +48,7 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**", "/swagger/**", "/swagger/api-docs/**", "/swagger-ui/**").permitAll()
-                        .requestMatchers(appSecurityProperties.getIgnoreUrls().toArray(String[]::new)).permitAll()
+                        .requestMatchers(ignoreUrls).permitAll()
                         .anyRequest().authenticated()
                 );
         return http.build();
